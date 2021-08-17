@@ -130,3 +130,4 @@ tm_shape(Index) +
                position = c("left", "bottom"))+
   tm_shape(Regions)+
   tm_borders(col = "grey40", lwd = 0.1)
+#edit

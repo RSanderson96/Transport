@@ -43,7 +43,7 @@ Index_Map = left_join(Index_Map, Cent_Info, by = "msoa11cd" )
 
 #Import regions file for visualisation
 Regions = sf::st_read(dsn = (paste0(Path, "/Regions")),layer="Regions_(December_2017)_Boundaries")%>%sf::st_transform(4326)
-
+Index_Map$Test = 1000*Index_Map$MinPMet
 tmap_mode("plot")
 
 # breaks argument used instead of style
@@ -57,7 +57,7 @@ tm_shape(Index_Map) +
           #legend.hist = TRUE,
           title = "Metres per minute",
           colorNA = "black") +
-  tm_layout(title = "Metres per minute",        # add a title
+  tm_layout(title = "Average ",        # add a title
             title.size = 1,
             title.color = "Black",
             title.position = c("left", "top"),
@@ -77,14 +77,14 @@ tm_shape(Index_Map) +
   tm_text("rgn17nm", size = 0.6)
 
 tm_shape(Index_Map) +
-  tm_fill("MinPMet",
+  tm_fill("Test",
           style = "fisher",    # used instead of user defined breaks
           #breaks = breaks,
           palette = 'GnBu', # for specific colors: c('#d7191c', '#fdae61', '#ffffbf', '#abdda4', '#2b83ba', '#253494')
           #legend.hist = TRUE,
           title = "Minutes per metre",
           colorNA = "black") +
-  tm_layout(title = "Minutes per metre",        # add a title
+  tm_layout(title = "Average Travel Time to Another Centroid (Minutes per Straight Line Metre)",        # add a title
             title.size = 1,
             title.color = "Black",
             title.position = c("left", "top"),
@@ -132,6 +132,35 @@ tm_shape(Index_Map) +
   tm_text("rgn17nm", size = 0.6)
 
 tm_shape(Index_Map) +
+  tm_fill("Total_PublicTransitTime",
+          style = "fisher",    # used instead of user defined breaks
+          #breaks = breaks,
+          palette = 'GnBu', # for specific colors: c('#d7191c', '#fdae61', '#ffffbf', '#abdda4', '#2b83ba', '#253494')
+          #legend.hist = TRUE,
+          title = "Travel Time (Minutes)",
+          colorNA = "black") +
+  tm_layout(title = "Average Travel Time on to Any MSOA Centroid (Public Transport Section)",        # add a title
+            title.size = 1,
+            title.color = "Black",
+            title.position = c("left", "top"),
+            inner.margins = c(0.09, 0.15, 0.10, 0.3),    # increase map margins to make space for legend
+            #fontfamily = 'Georgia',
+            #bg.color = "grey95",
+            frame = TRUE) +
+  #tm_borders(col = "grey40", lwd = 0.1)+
+  tm_legend(title.size=1,
+            text.size = 0.8,
+            #frame = "grey",
+            position = c("right", "centre")) +
+  tm_scale_bar(color.dark = "gray60",
+               position = c("left", "bottom"))+
+  tm_shape(Regions)+
+  tm_borders(col = "grey40", lwd = 0.1)+
+  tm_text("rgn17nm", size = 0.6)
+
+
+
+tm_shape(Index_Map) +
   tm_fill("Total_Travel_Time",
           style = "fisher",    # used instead of user defined breaks
           #breaks = breaks,
@@ -161,13 +190,13 @@ tm_shape(Index_Map) +
 
 
 
-
-
+Rural_Urban = read.csv("RUC_Class.csv")
+Index_Map = left_join(Index_Map,Rural_Urban)
 
 library(ggplot2)
 library(RColorBrewer)
 # Basic scatter plot
-ggplot(Index_Map, aes(x=Total_Travel_Time, y=dist, color = Region ))+ geom_point()
+ggplot(Index_Map, aes(x=Total_Travel_Time, y=MinPMet, color = RUC11 ))+ geom_point()
 
 
 
